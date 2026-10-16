@@ -1,0 +1,143 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NodeMCU User Form</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f2f2f2;
+      margin: 0;
+      padding: 25px 15px;
+    }
+
+    .container {
+      max-width: 400px;
+      margin: auto;
+      background: white;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px #ccc;
+    }
+
+    h2 {
+      text-align: center;
+      color: #333;
+    }
+
+    label {
+      display: block;
+      margin-top: 12px;
+      font-weight: bold;
+    }
+
+    input {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    button {
+      width: 100%;
+      margin-top: 20px;
+      padding: 12px;
+      border: none;
+      border-radius: 5px;
+      background: #087f5b;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #066b4d;
+    }
+
+    #message {
+      text-align: center;
+      margin-top: 15px;
+      overflow-wrap: anywhere;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h2>User Registration</h2>
+
+    <form id="userForm">
+      <label for="username">Username</label>
+      <input id="username" required>
+
+      <label for="password">Password</label>
+      <input id="password" type="password" required>
+
+      <label for="name">Full Name</label>
+      <input id="name" required>
+
+      <label for="address">Address</label>
+      <input id="address" required>
+
+      <label for="contact">Contact Number</label>
+      <input id="contact" type="tel" required>
+
+      <button type="submit">Save</button>
+    </form>
+
+    <p id="message"></p>
+  </div>
+
+  <script>
+    const apiURL =
+      "https://wokwi-json-server.onrender.com/users";
+
+    document.getElementById("userForm")
+      .addEventListener("submit", async function(event) {
+        event.preventDefault();
+
+        const message = document.getElementById("message");
+        message.textContent = "Saving data...";
+
+        const user = {
+          username: document.getElementById("username").value,
+          password: document.getElementById("password").value,
+          name: document.getElementById("name").value,
+          address: document.getElementById("address").value,
+          contact: document.getElementById("contact").value
+        };
+
+        try {
+          const response = await fetch(apiURL, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify(user)
+          });
+
+          if (!response.ok) {
+            throw new Error("Server error: " + response.status);
+          }
+
+          const result = await response.json();
+
+          message.textContent =
+            "Saved successfully! Record ID: " + result.id;
+
+          document.getElementById("userForm").reset();
+
+        } catch (error) {
+          message.textContent =
+            "Could not save data. Check your internet or server.";
+          console.error(error);
+        }
+      });
+  </script>
+</body>
+</html>
